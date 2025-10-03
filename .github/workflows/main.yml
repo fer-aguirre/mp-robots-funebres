@@ -1,0 +1,33 @@
+name: Scrape funebres
+
+on:
+  schedule:
+    - cron: '03 13 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install beautifulsoup4 requests pandas
+
+      - name: Run scraper
+        run: python scraper.py
+
+      # Hacer commit y push de los resultados al repositorio
+      - name: Commit results
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add .
+          git diff --staged --quiet || git commit -m "Actualización de datos: $(date +'%Y-%m-%d')"
+          git push
